@@ -20,7 +20,7 @@ def test_length():
 
 def test_iter():
     global sa
-    for i, val in enumerate(sa.iter_values_over_range_with_none()):
+    for i, val in enumerate(sa.values()):
         assert str(i) == val
     assert i == 99
 
@@ -28,7 +28,7 @@ def test_map():
     global sa
     def mapping(element):
         assert element
-    map(mapping, sa.iter_values_over_range_with_none())
+    map(mapping, sa.values())
 
 def test_find():
     global sa
@@ -80,6 +80,61 @@ def test_insert():
 
     assert len(x) == len(sa)
 
-    for i1, i2 in zip(x, sa.iter_values_over_range_with_none()):
+    for i1, i2 in zip(x, sa.values()):
         assert i1 == i2
     
+def test_iters_and_remove():
+    x = SparseArray(range(100))
+    assert len(x) == 100
+    for i, v in enumerate(x.values()):
+        assert i == v
+    for i, (ii, iv) in enumerate(x.items()):
+        assert i == ii
+        assert i == iv
+    for i, ii in enumerate(x.indices()):
+        assert i == ii
+
+    assert x.index(50) == 50
+    try:
+        x.index(200)
+    except ValueError:
+        pass
+    else:
+        assert False
+
+    x.remove(50)
+
+    try:
+        x.index(50)
+    except ValueError:
+        pass
+    else:
+        assert False
+
+    assert len(x) == 100
+    for i, v in enumerate(x.values()):
+        if i == 50:
+            assert v is None
+        else:
+            assert i == v
+    assert i == 99
+    for i, (ii, iv) in enumerate(x.items()):
+        m_i = i
+        assert ii != 50
+        if i >= 50:
+            m_i += 1
+        assert m_i == ii
+        assert m_i == iv
+    assert i == 98
+    for i, ii in enumerate(x.indices()):
+        m_i = i
+        assert ii != 50
+        if i >= 50:
+            m_i += 1
+        assert m_i == ii
+    assert i == 98
+
+    for _, value in [value for value in x.items()]:
+        x.remove(value)
+
+    assert len(x) == 0

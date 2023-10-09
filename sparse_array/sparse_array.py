@@ -1,4 +1,4 @@
-from typing import MutableSequence, List, Any, TypeVar, Tuple, Generator, Optional
+from typing import MutableSequence, List, Any, TypeVar, Tuple, Generator, Optional, Iterable
 
 BITS_PER_BYTE = 8
 
@@ -9,7 +9,7 @@ def _pop_count(v: int):
 
 T = TypeVar('T')
 class SparseArray(MutableSequence[T]):
-    def __init__(self, initlist=None) -> None:
+    def __init__(self, initlist: Iterable[T]=None) -> None:
         self._bit_arrays: List[int] = []
         self._data: List[Tuple[int, T]] = []
         self._length = 0
@@ -111,16 +111,31 @@ class SparseArray(MutableSequence[T]):
     def __iter__(self):
         raise NotImplementedError()
     
-    def iter_indices_and_values(self) -> Generator[Tuple[int, T], None, None]:
+    def indices(self) -> Generator[int, None, None]:
+        self._sort_data()
+        return (x[0] for x in self._data)
+
+    def items(self) -> Generator[Tuple[int, T], None, None]:
+        self._sort_data()
         return (x for x in self._data)
         
-    def iter_values_over_range_with_none(self) -> Generator[Optional[T], None, None]:
-        return (self.get(x, None) for x in range(len(self)))
+    def values(self, default: T = None) -> Generator[Optional[T], None, None]:
+        return (self.get(x, default if default is not None else None) for x in range(len(self)))
 
     def append(self, value: T) -> None:
         self[len(self)] = value
 
-    def get(self, index, default=None):
+    def remove(self, value: T) -> None:
+        index = self.index(value)
+        del self[index]
+
+    def index(self, value: T) -> int:
+        for d_index, d_value in self._data:
+            if d_value == value:
+                return d_index
+        raise ValueError()
+
+    def get(self, index, default=None) -> Optional[T]:
         try:
             return self[index]
         except IndexError:
@@ -140,7 +155,7 @@ class SparseArray(MutableSequence[T]):
     def insert(self, index: int, value: Any) -> None:
         self._sort_data()
 
-        # Elements do not move in the list when removed
+        # elements do not shift when one is removed
         for entry_index, entry_value in self._data[::-1]:
             if entry_index < index:
                 break
