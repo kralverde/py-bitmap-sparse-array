@@ -78,6 +78,7 @@ class SparseArray(MutableSequence[T]):
         return array_pos
 
     def __setitem__(self, index, item):
+        assert isinstance(index, int)
         if index < 0:
             index = len(self) + index
         pos = self._internal_position_for(index, False)
@@ -102,6 +103,7 @@ class SparseArray(MutableSequence[T]):
         self[index] = None
 
     def __getitem__(self, index):
+        assert isinstance(index, int)
         self._sort_data()
         pos = self._internal_position_for(index, True)
         if pos < 0:
@@ -120,6 +122,7 @@ class SparseArray(MutableSequence[T]):
         return (x for x in self._data)
         
     def values(self, default: T = None) -> Generator[Optional[T], None, None]:
+        self._sort_data()
         return (self.get(x, default if default is not None else None) for x in range(len(self)))
 
     def append(self, value: T) -> None:
@@ -154,14 +157,12 @@ class SparseArray(MutableSequence[T]):
 
     def insert(self, index: int, value: Any) -> None:
         self._sort_data()
-
         # elements do not shift when one is removed
         for entry_index, entry_value in self._data[::-1]:
             if entry_index < index:
                 break
             self[entry_index+1] = entry_value
             del self[entry_index]
-        
         self[index] = value
 
     def bit_field(self) -> bytes:
