@@ -41,7 +41,7 @@ You cannot iterate over the `SparseArray` itself. Instead, 3 generators are prov
 
 `SparseArray.values()` returns a generator of values with a default value for non-set indices.
 
->>>list(sa.values())
+>>> list(sa.values())
 ['0', None, '2']
->>>list(sa.values('default'))
+>>> list(sa.values('default'))
 ['0', 'default', '2']
