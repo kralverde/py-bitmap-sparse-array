@@ -30,14 +30,17 @@ You cannot iterate over the `SparseArray` itself. Instead, 3 generators are prov
 >>> sa[2] = '2'
 
 `SparseArray.indices()` returns a generator of indices that have values.
+
 >>> list(sa.indices())
 [0, 2]
 
 `SparseArray.items()` returns a generator of tuples of indices and values, similar to `Mapping.items()`.
+
 >>> list(sa.items())
 [(0, '0'), (2, '2')]
 
 `SparseArray.values()` returns a generator of values with a default value for non-set indices.
+
 >>>list(sa.values())
 ['0', None, '2']
 >>>list(sa.values('default'))
