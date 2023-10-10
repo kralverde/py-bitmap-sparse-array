@@ -1,4 +1,4 @@
-This code has been transpiled from `js-sparse-array <https://github.com/pgte/js-sparse-array/commit/a489406f6abb5aa4bb7b536b8b73289944bf4343>_` and has minimal changes. 
+This code has been transpiled from `js-sparse-array <https://github.com/pgte/js-sparse-array/commit/a489406f6abb5aa4bb7b536b8b73289944bf4343>`_ and has minimal changes. 
 
 Usage
 -----
