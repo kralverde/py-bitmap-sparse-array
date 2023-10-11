@@ -34,8 +34,8 @@ jobs:
         pytest
     - name: Lint with mypy
       run: |
-        mypy --strict sparse_array
+        mypy --strict bitmap_sparse_array
     - name: Lint with pylint
       run: |
-        pylint --errors-only --rcfile=.pylintrc sparse_array
-        pylint --exit-zero --rcfile=.pylintrc --disable=fixme sparse_array
+        pylint --errors-only --rcfile=.pylintrc bitmap_sparse_array
+        pylint --exit-zero --rcfile=.pylintrc --disable=fixme bitmap_sparse_array
