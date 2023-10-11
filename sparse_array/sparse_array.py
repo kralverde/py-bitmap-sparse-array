@@ -1,4 +1,4 @@
-from typing import MutableSequence, List, Any, TypeVar, Tuple, Generator, Optional, Iterable
+from typing import MutableSequence, List, TypeVar, Tuple, Generator, Optional, Iterable, SupportsIndex
 
 BITS_PER_BYTE = 8
 
@@ -10,7 +10,7 @@ def _pop_count(v: int):
 T = TypeVar('T')
 class SparseArray(MutableSequence[T]):
     def __init__(self, initlist: Iterable[T]=None) -> None:
-        self._bit_arrays: List[int] = []
+        self._bit_arrays = bytearray()
         self._data: List[Tuple[int, T]] = []
         self._length = 0
         self._changed_length = False
@@ -77,33 +77,37 @@ class SparseArray(MutableSequence[T]):
         array_pos = previous_pop_count + byte_pop_count - 1
         return array_pos
 
-    def __setitem__(self, index, item):
-        assert isinstance(index, int)
+    def __setitem__(self, index: SupportsIndex, item: T):
+        if not isinstance(index, SupportsIndex):
+            raise TypeError(f'SparseArray indices must be integers, not {type(index)}')
         if index < 0:
             index = len(self) + index
         pos = self._internal_position_for(index, False)
-        if item is None:
-            if pos >= 0:
-                self._unset_internal_position(pos)
-                self._unset_bit(index)
-                self._changed_length = True
-                self._changed_data = True
+        if pos < 0:
+            pos = len(self._data)
+            self._set_bit(index)
+            self._changed_data = True
+            needs_sort = False
         else:
-            if pos < 0:
-                pos = len(self._data)
-                self._set_bit(index)
-                self._changed_data = True
-                needs_sort = False
-            else:
-                needs_sort = True
-            self._set_internal_position(pos, index, item, needs_sort)
-            self._changed_length = True
+            needs_sort = True
+        self._set_internal_position(pos, index, item, needs_sort)
+        self._changed_length = True
 
     def __delitem__(self, index):
-        self[index] = None
+        if not isinstance(index, SupportsIndex):
+            raise TypeError(f'SparseArray indices must be integers, not {type(index)}')
+        if index < 0:
+            index = len(self) + index
+        pos = self._internal_position_for(index, False)
+        if pos >= 0:
+            self._unset_internal_position(pos)
+            self._unset_bit(index)
+            self._changed_length = True
+            self._changed_data = True
 
     def __getitem__(self, index):
-        assert isinstance(index, int)
+        if not isinstance(index, SupportsIndex):
+            raise TypeError(f'SparseArray indices must be integers, not {type(index)}')
         self._sort_data()
         pos = self._internal_position_for(index, True)
         if pos < 0:
@@ -121,9 +125,9 @@ class SparseArray(MutableSequence[T]):
         self._sort_data()
         return (x for x in self._data)
         
-    def values(self, default: T = None) -> Generator[Optional[T], None, None]:
+    def values(self, *, default: T = None, start: int = 0, end: int = None) -> Generator[Optional[T], None, None]:
         self._sort_data()
-        return (self.get(x, default if default is not None else None) for x in range(len(self)))
+        return (self.get(x, default if default is not None else None) for x in range(start, end or len(self)))
 
     def append(self, value: T) -> None:
         self[len(self)] = value
@@ -144,6 +148,9 @@ class SparseArray(MutableSequence[T]):
         except IndexError:
             return default
 
+    def insert(self, index, item):
+        raise NotImplementedError()
+
     def __len__(self):
         self._sort_data()
         if self._changed_length:
@@ -154,16 +161,6 @@ class SparseArray(MutableSequence[T]):
                 self._length = 0
             self._changed_length = False
         return self._length
-
-    def insert(self, index: int, value: Any) -> None:
-        self._sort_data()
-        # elements do not shift when one is removed
-        for entry_index, entry_value in self._data[::-1]:
-            if entry_index < index:
-                break
-            self[entry_index+1] = entry_value
-            del self[entry_index]
-        self[index] = value
 
     def bit_field(self) -> bytes:
         raw_nums = []

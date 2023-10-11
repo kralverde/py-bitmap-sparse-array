@@ -71,18 +71,6 @@ def test_unsets_rev():
             assert j < i
             assert sa[j] == j
 
-def test_insert():
-    x = list(range(100))
-    sa = SparseArray[int](x)
-
-    x.insert(50, 1000)
-    sa.insert(50, 1000)
-
-    assert len(x) == len(sa)
-
-    for i1, i2 in zip(x, sa.values()):
-        assert i1 == i2
-    
 def test_iters_and_remove():
     x = SparseArray(range(100))
     assert len(x) == 100
@@ -138,3 +126,8 @@ def test_iters_and_remove():
         x.remove(value)
 
     assert len(x) == 0
+
+def test_null_value():
+    x = SparseArray()
+    x[1] = None
+    assert x.get(1, 'not null') is None

@@ -23,7 +23,7 @@ IndexError()
 
 Iterating
 ^^^^^^^^^
-You cannot iterate over the `SparseArray` itself. Instead, 3 generators are provided.
+Due to the sparse nature of `SparseArray`, it does not make sense to iterate over all values in the traditional sense because of possible omitted indices. Therefore, you cannot iterate over the `SparseArray` itself. Instead, 3 generators are provided.
 
 >>> sa = SparseArray()
 >>> sa[0] = '0'
@@ -39,9 +39,11 @@ You cannot iterate over the `SparseArray` itself. Instead, 3 generators are prov
 >>> list(sa.items())
 [(0, '0'), (2, '2')]
 
-`SparseArray.values()` returns a generator of values with a default value for non-set indices.
+`SparseArray.values(*, default=None, start=0, end=None)` returns a generator of values with a default value for non-set indices.
 
 >>> list(sa.values())
 ['0', None, '2']
->>> list(sa.values('default'))
+>>> list(sa.values(default='default'))
 ['0', 'default', '2']
+
+For the same reasons, you cannot get or set slices of a `SparseArray`, nor `insert()`
