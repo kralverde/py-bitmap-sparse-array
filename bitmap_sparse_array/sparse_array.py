@@ -79,7 +79,6 @@ class SparseArray(MutableSequence[T]):
         array_pos = previous_pop_count + byte_pop_count - 1
         return array_pos
 
-    
     def __setitem__(self, index: int, item: T) -> None:  # type: ignore[override]
         if not isinstance(index, int):
             raise TypeError(f'SparseArray indices must be integers, not {type(index)}')
@@ -142,8 +141,10 @@ class SparseArray(MutableSequence[T]):
     def index(self, value: T, start: int = 0, stop: int = sys.maxsize) -> int:
         self._sort_data()
         for d_index, d_value in self._data:
-            if d_index < start: continue
-            if d_index >= stop: break
+            if d_index < start: 
+                continue
+            if d_index >= stop: 
+                break
             if d_value == value:
                 return d_index
         raise ValueError()
@@ -154,7 +155,7 @@ class SparseArray(MutableSequence[T]):
         except IndexError:
             return default
 
-    def insert(self, index: int, item: T) -> None:
+    def insert(self, index: int, value: T) -> None:
         raise NotImplementedError()
 
     def __len__(self) -> int:
@@ -201,4 +202,3 @@ class SparseArray(MutableSequence[T]):
                 break
 
         return bytes(raw_nums)
-
