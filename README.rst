@@ -7,7 +7,7 @@ SparseArray implements `MutableSequence`.
 
 We suggest you import the SparseArray as follows:
 
->>> from sparse_array import SparseArray
+>>> from bitmap_sparse_array import SparseArray
 
 Setting and getting
 ^^^^^^^^^^^^^^^^^^^

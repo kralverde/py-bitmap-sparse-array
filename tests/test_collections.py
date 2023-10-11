@@ -1,4 +1,4 @@
-from sparse_array import SparseArray
+from bitmap_sparse_array import SparseArray
 
 def test_creation():
     global sa
